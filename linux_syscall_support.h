@@ -142,11 +142,13 @@ extern "C" {
 #pragma push_macro("lstat64")
 #pragma push_macro("pread64")
 #pragma push_macro("pwrite64")
+#pragma push_macro("getdents64")
 #undef stat64
 #undef fstat64
 #undef lstat64
 #undef pread64
 #undef pwrite64
+#undef getdents64
 
 #if defined(__ANDROID__) && defined(__x86_64__)
 // A number of x86_64 syscalls are blocked by seccomp on recent Android;
@@ -1960,7 +1962,7 @@ struct kernel_statfs {
                            LSS_ENTRYPOINT                                     \
                            "pop %%ebx"                                        \
                            args                                               \
-                           : "esp", "memory");                                \
+                           : "memory");                                       \
       LSS_RETURN(type,__res)
     #undef  _syscall0
     #define _syscall0(type,name)                                              \
@@ -2017,7 +2019,7 @@ struct kernel_statfs {
                              : "i" (__NR_##name), "ri" ((long)(arg1)),        \
                                "c" ((long)(arg2)), "d" ((long)(arg3)),        \
                                "S" ((long)(arg4)), "D" ((long)(arg5))         \
-                             : "esp", "memory");                              \
+                             : "memory");                                     \
         LSS_RETURN(type,__res);                                               \
       }
     #undef  _syscall6
@@ -2039,7 +2041,7 @@ struct kernel_statfs {
                              : "i" (__NR_##name),  "0" ((long)(&__s)),        \
                                "c" ((long)(arg2)), "d" ((long)(arg3)),        \
                                "S" ((long)(arg4)), "D" ((long)(arg5))         \
-                             : "esp", "memory");                              \
+                             : "memory");                                     \
         LSS_RETURN(type,__res);                                               \
       }
     LSS_INLINE int LSS_NAME(clone)(int (*fn)(void *), void *child_stack,
@@ -2125,7 +2127,7 @@ struct kernel_statfs {
                            : "0"(-EINVAL), "i"(__NR_clone),
                              "m"(fn), "m"(child_stack), "m"(flags), "m"(arg),
                              "m"(parent_tidptr), "m"(newtls), "m"(child_tidptr)
-                           : "esp", "memory", "ecx", "edx", "esi", "edi");
+                           : "memory", "ecx", "edx", "esi", "edi");
       LSS_RETURN(int, __res);
     }
 
@@ -4524,6 +4526,7 @@ struct kernel_statfs {
 #pragma pop_macro("lstat64")
 #pragma pop_macro("pread64")
 #pragma pop_macro("pwrite64")
+#pragma pop_macro("getdents64")
 
 #if defined(__cplusplus) && !defined(SYS_CPLUSPLUS)
 }
